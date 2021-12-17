@@ -10,11 +10,13 @@
             // params inside response to server-side
             let resp = (await ajaxRequest({ wh: 'get_data', name: this.name, params })).data;
 
-            /* prepare data for place it into HTML of component */
+            // prepare data for place it into HTML of component
+            // types of data: text, html, src, value, href, title and objects style, dataset
             let data = {
-                class_name: { text: resp.data_one },
-                class_name: { src: resp.data_src },
-                class_name: { html: resp.data_html }
+                class_name1: { text: resp.data_one, dataset: { _id: resp._id } },
+                class_name2: { src: resp.data_src },
+                class_name3: { html: resp.data_html },
+                class_name4: { style: { color: 'red' } }
             }
 
             startAfterLoaded()
@@ -40,7 +42,8 @@
     // place here local functions
     async function startAfterLoaded() {
         const header = await sc.getComp('header')
-        // code here executes after header is ready to use anywhere
+        // Code here executes after header is ready to use anywhere
+        // You can set event handlers here. For exapmle intersection observer with "replace" method in it.        
     } // func start after loaded
 
 }
