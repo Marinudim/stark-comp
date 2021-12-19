@@ -4,7 +4,7 @@
     let resp = {}
 
     sc.setComp({ // example of single component header
-        name: 'header', params: false,
+        name: 'article', params: false,
         init: async function (params, method) { // params for reuse component by methods replace and insert
             // used method returned by StarkComp - "init", "replace" or "insert"
             if (!params) return {} // if you want postponed initialization
@@ -23,13 +23,15 @@
             // prepare data for place it into HTML of component
             // types of data: text, html, src, value, href, title and objects style, dataset
             let data = {
-                user_name: { text: resp.data_one, dataset: { _id: resp._id } },
-                avatar: { src: resp.data_src },
-                class_name3: { html: resp.data_html },
+                title: { text: resp.title, dataset: { _id: resp._id } },
+                image: { src: resp.image },
+                content: { html: resp.content },
                 class_name4: { style: { color: 'red' } }
             }
 
             afterLoad()
+
+            setIntersectionObserver()
 
             return {
                 target: document.querySelector(`.${this.name}`),
@@ -40,14 +42,7 @@
         events: [  // events array
             {
                 target: 'some_class', event: 'click',
-                func: async function (e) {
-                    const otherComponent = await sc.getComp('otherComponent')
-                    otherComponent.data.forEach(datum => {
-                        // some actions with datum
-                        datum.style.color = 'yellow';
-                    })
-                    await sc.refresh({ name: 'otherComponent' })
-                } // event func
+                func: async function (e) { } // event func
             },
             {
                 target: 'other_class', event: 'mouseover',
@@ -60,7 +55,28 @@
     async function afterLoad() {
         const header = await sc.getComp('header')
         // Code here executes after header is ready to use anywhere
+        // You can get data from header here
+        console.log('header data', header.data)
         // You can set event handlers here.
     } // func start after loaded
+
+    async function setIntersectionObserver() {
+        const article = await sc.getComp('article')
+        const lastArticle = article.target.children[article.length - 1]
+        let options = {
+            root: null, // article.target,
+            rootMargin: '0px',
+            threshold: 1 // 1 - whole in body, .5 - half
+        }
+        let observer = new IntersectionObserver(async (e) => {
+            if (e[0].isIntersecting) {
+                observer.unobserve(lastArticle)
+                let limit = 2,
+                    skip = article.length - 1;
+                await sc.insert({ name: 'article', params: { skip, limit, article_id: params.article_id }, index: 'after' })
+            }
+        }, options);
+        observer.observe(lastArticle)
+    } // func set intersection observer
 
 }
