@@ -7,7 +7,7 @@
         name: 'article', params: false,
         init: async function (params, method) { // params for reuse component by methods replace and insert
             // used method returned by StarkComp - "init", "replace" or "insert"
-            if (!params) return {} // if you want postponed initialization
+            if (!params) return [] // if you want postponed initialization
 
             // params inside response to server-side
             // get response from server depend on params and method
@@ -22,12 +22,17 @@
 
             // prepare data for place it into HTML of component
             // types of data: text, html, src, value, href, title and objects style, dataset
-            let data = {
-                title: { text: resp.title, dataset: { _id: resp._id } },
-                image: { src: resp.image },
-                content: { html: resp.content },
-                class_name4: { style: { color: 'red' } }
-            }
+
+            let data = [], index = 0;
+            for (let item of resp) {
+                data[index] = {
+                    title: { text: item.title, dataset: { _id: item._id } },
+                    image: { src: item.image },
+                    content: { html: item.content },
+                    class_name4: { style: { color: 'red' } }
+                }
+                index++
+            } // for item of resp
 
             afterLoad()
 
